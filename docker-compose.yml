@@ -1,0 +1,16 @@
+---
+version: '3'
+services:
+  embot-core:
+    image: "embot/embot-core:latest"
+  chat-lex-interface:
+    image: "embot/chat-lex-interface:latest"
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - CORE_URL=http://embot-core
+      - HANGOUTS_SECRET_TOKEN
+    ports:
+      - "3000:3000"
+
