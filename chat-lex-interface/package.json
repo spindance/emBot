@@ -1,0 +1,23 @@
+{
+  "name": "chat-lex-interface",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "micro-dev -p ${PORT:-3000} dist/index.js",
+    "start": "micro -p ${PORT:-3000} dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "michael.mosher",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/micro": "^7.3.1",
+    "@types/node": "^9.4.7",
+    "micro-dev": "^2.2.2",
+    "typescript": "^2.7.2"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.209.0",
+    "micro": "^9.1.4"
+  }
+}

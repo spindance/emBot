@@ -1,0 +1,62 @@
+{
+    "cards": [
+        {
+            "header": {
+                "title": "Zenoss Alert",
+                "subtitle": "https://zenmaster.spindance.net",
+                "imageUrl": "https://raw.githubusercontent.com/michaelmosher/zenoss-web/master/splash.png"
+            },
+            "sections": [
+                {
+                    "widgets": [
+                        {
+                            "textParagraph": {
+                                "text": "<b>server.domain.tld</b> - There was an error"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "widgets": [
+                        {
+                            "buttons": [
+                                {
+                                    "textButton": {
+                                        "text": "Acknowledge",
+                                        "onClick": {
+                                            "action": {
+                                                "actionMethodName": "mAcknowledgeZenossEvent",
+                                                "parameters": [
+                                                    {
+                                                        "key": "eventID",
+                                                        "value": "180B7E46-08E6-4529-89F2-9E30DE30BEA6"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "textButton": {
+                                        "text": "Close",
+                                        "onClick": {
+                                            "action": {
+                                                "actionMethodName": "mCloseZenossEvent",
+                                                "parameters": [
+                                                    {
+                                                        "key": "eventID",
+                                                        "value": "180B7E46-08E6-4529-89F2-9E30DE30BEA6"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
