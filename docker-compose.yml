@@ -1,6 +1,10 @@
 ---
 version: '3'
 services:
+  google-calendar-interface:
+    build: "./google-calendar-interface"
+    environment:
+      # - google calendar credentials
   embot-core:
     build: "./embot-core"
   chat-lex-interface:

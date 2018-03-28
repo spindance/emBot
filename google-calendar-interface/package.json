@@ -1,0 +1,21 @@
+{
+  "name": "google-calendar-interface",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "michael.mosher",
+  "license": "ISC",
+  "dependencies": {
+    "googleapis": "^27.0.0",
+    "micro": "^9.1.4"
+  },
+  "devDependencies": {
+    "@types/micro": "^7.3.1",
+    "@types/node": "^7.0.58",
+    "micro-dev": "^2.2.2",
+    "typescript": "^2.8.1"
+  }
+}
