@@ -44,7 +44,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
             case 0: return [4, micro_1.json(req)];
             case 1:
                 body = _a.sent();
-                res.end('You triggered the CheckSpecificConferenceRoom Intent!');
+                res.end('You triggered the CloseZenossEvent Intent!');
                 return [2];
         }
     });
