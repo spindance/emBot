@@ -2,13 +2,14 @@ import * as AWS from 'aws-sdk'
 import * as Crypto from 'crypto'
 import * as HTTP from 'http'
 import { json } from 'micro'
+import fetch, * as Fetch from 'node-fetch'
 
 import * as Hangouts from './hangouts'
 const example = require('./hangouts/cardExample')
 
-// let botCoreUrl = process.env.CORE_URL
-const botVersion = process.env.BOT_VERSION || 'latest'
-const secretToken = process.env.HANGOUTS_SECRET_TOKEN
+const SECRET_TOKEN = process.env.HANGOUTS_SECRET_TOKEN
+const LEX_BOT_VERSION = process.env.LEX_BOT_VERSION || 'latest'
+const BOT_CORE_URL = process.env.CORE_URL
 
 const lexruntime = new AWS.LexRuntime({
     region: 'us-east-1'
@@ -34,7 +35,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     const body = await json(req) as Hangouts.Event
 
     // validate request is coming from Hangouts Chat
-    if (body.token !== secretToken) {
+    if (body.token !== SECRET_TOKEN) {
         res.writeHead(403)
         res.end('unauthorized')
         return
@@ -59,9 +60,9 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
                     eventID: eventID
                 }
             }
-            // send request to botCore
-            // format response
-            res.end('{"text": "Ok."}')
+
+            let rs = await coreRequest(lRes)
+            res.end(rs)
             return
         }
 
@@ -79,9 +80,8 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             let lRes = await postLex(params)
 
             if (lRes.dialogState === 'ReadyForFulfillment') {
-                // send request to botCore
-                // format response
-                res.end('{"text": "Ok."}')
+                let rs = await coreRequest(lRes)
+                res.end(rs)
                 return
             }
 
@@ -107,7 +107,7 @@ function buildLexParams(h: Hangouts.MessageEvent): lexInput {
 
     return {
         botName: 'emBot',
-        botAlias: botVersion,
+        botAlias: LEX_BOT_VERSION,
         userId: hash.digest('hex'),
         inputText: h.message.text
     }
@@ -121,4 +121,26 @@ function postLex(i: lexInput): Promise<lexOutput> {
                 : resolve(data as lexOutput)
         })
     })
+}
+
+async function coreRequest(l: lexOutput): Promise<string> {
+    const rq = buildCoreRequest(l)
+    const rs = await fetch(rq)
+
+    return handleCoreResponse(rs)
+}
+
+function buildCoreRequest(l: lexOutput): Fetch.Request {
+    const url = `${BOT_CORE_URL}/${l.intentName}`
+
+    return new Fetch.Request(url, {
+        method: 'POST',
+        body: JSON.stringify(l),
+        headers: { 'Content-Type': 'application/json' }
+    })
+}
+
+async function handleCoreResponse(rs: Fetch.Response): Promise<string> {
+    return rs.text()
+        .then(t => JSON.stringify({ text: t }))
 }

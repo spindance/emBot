@@ -39,21 +39,23 @@ exports.__esModule = true;
 var AWS = require("aws-sdk");
 var Crypto = require("crypto");
 var micro_1 = require("micro");
+var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
 var Hangouts = require("./hangouts");
 var example = require('./hangouts/cardExample');
-var botVersion = process.env.BOT_VERSION || 'latest';
-var secretToken = process.env.HANGOUTS_SECRET_TOKEN;
+var SECRET_TOKEN = process.env.HANGOUTS_SECRET_TOKEN;
+var LEX_BOT_VERSION = process.env.LEX_BOT_VERSION || 'latest';
+var BOT_CORE_URL = process.env.CORE_URL;
 var lexruntime = new AWS.LexRuntime({
     region: 'us-east-1'
 });
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, _a, b, eventID, lRes, b, params, lRes;
+    var body, _a, b, eventID, lRes, rs, b, params, lRes, rs;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0: return [4, micro_1.json(req)];
             case 1:
                 body = _b.sent();
-                if (body.token !== secretToken) {
+                if (body.token !== SECRET_TOKEN) {
                     res.writeHead(403);
                     res.end('unauthorized');
                     return [2];
@@ -62,9 +64,9 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 switch (_a) {
                     case Hangouts.EventType.ADDED: return [3, 2];
                     case Hangouts.EventType.CARD: return [3, 3];
-                    case Hangouts.EventType.MESSAGE: return [3, 4];
+                    case Hangouts.EventType.MESSAGE: return [3, 5];
                 }
-                return [3, 6];
+                return [3, 9];
             case 2:
                 {
                     res.end('{"text": Thanks for adding me!"}');
@@ -72,22 +74,22 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 }
                 _b.label = 3;
             case 3:
-                {
-                    b = body;
-                    eventID = b.action.parameters.filter(function (p) { return p.key === 'eventID'; })[0].value;
-                    lRes = {
-                        dialogState: 'ReadyForFulfillment',
-                        intentName: b.action.actionMethodName,
-                        message: null,
-                        slots: {
-                            eventID: eventID
-                        }
-                    };
-                    res.end('{"text": "Ok."}');
-                    return [2];
-                }
-                _b.label = 4;
+                b = body;
+                eventID = b.action.parameters.filter(function (p) { return p.key === 'eventID'; })[0].value;
+                lRes = {
+                    dialogState: 'ReadyForFulfillment',
+                    intentName: b.action.actionMethodName,
+                    message: null,
+                    slots: {
+                        eventID: eventID
+                    }
+                };
+                return [4, coreRequest(lRes)];
             case 4:
+                rs = _b.sent();
+                res.end(rs);
+                return [2];
+            case 5:
                 b = body;
                 if (b.message.text.includes('zenoss')) {
                     res.end(JSON.stringify(example));
@@ -95,20 +97,23 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 }
                 params = buildLexParams(b);
                 return [4, postLex(params)];
-            case 5:
+            case 6:
                 lRes = _b.sent();
-                if (lRes.dialogState === 'ReadyForFulfillment') {
-                    res.end('{"text": "Ok."}');
-                    return [2];
-                }
+                if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 8];
+                return [4, coreRequest(lRes)];
+            case 7:
+                rs = _b.sent();
+                res.end(rs);
+                return [2];
+            case 8:
                 res.end(JSON.stringify({ text: lRes.message }));
                 return [2];
-            case 6:
+            case 9:
                 {
                     res.end('bye');
                 }
-                _b.label = 7;
-            case 7: return [2];
+                _b.label = 10;
+            case 10: return [2];
         }
     });
 }); };
@@ -117,7 +122,7 @@ function buildLexParams(h) {
     hash.update(h.message.sender.displayName);
     return {
         botName: 'emBot',
-        botAlias: botVersion,
+        botAlias: LEX_BOT_VERSION,
         userId: hash.digest('hex'),
         inputText: h.message.text
     };
@@ -128,6 +133,37 @@ function postLex(i) {
             return (err)
                 ? reject(err)
                 : resolve(data);
+        });
+    });
+}
+function coreRequest(l) {
+    return __awaiter(this, void 0, void 0, function () {
+        var rq, rs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    rq = buildCoreRequest(l);
+                    return [4, node_fetch_1["default"](rq)];
+                case 1:
+                    rs = _a.sent();
+                    return [2, handleCoreResponse(rs)];
+            }
+        });
+    });
+}
+function buildCoreRequest(l) {
+    var url = BOT_CORE_URL + "/" + l.intentName;
+    return new Fetch.Request(url, {
+        method: 'POST',
+        body: JSON.stringify(l),
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
+function handleCoreResponse(rs) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2, rs.text()
+                    .then(function (t) { return JSON.stringify({ text: t }); })];
         });
     });
 }
