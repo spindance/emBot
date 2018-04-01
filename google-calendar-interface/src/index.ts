@@ -56,6 +56,8 @@ async function requestEvents(cli: GoogleAuth, cal: Calendar.Calendar): Promise<C
 
     const params = {
         fields: 'items(creator/displayName,end/dateTime,location,start/dateTime,summary),summary',
+        orderBy: 'startTime',
+        singleEvents: true,
         timeMin: min.toISOString(),
         timeMax: max.toISOString()
     }

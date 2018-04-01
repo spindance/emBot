@@ -105,6 +105,8 @@ function requestEvents(cli, cal) {
                     max = new Date(min.valueOf() + EIGHT_HOURS);
                     params = {
                         fields: 'items(creator/displayName,end/dateTime,location,start/dateTime,summary),summary',
+                        orderBy: 'startTime',
+                        singleEvents: true,
                         timeMin: min.toISOString(),
                         timeMax: max.toISOString()
                     };

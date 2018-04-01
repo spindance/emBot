@@ -4,9 +4,12 @@ services:
   google-calendar-interface:
     build: "./google-calendar-interface"
     environment:
-      # - google calendar credentials
+      - GOOGLE_SERVICE_ACCOUNT_EMAIL
+      - GOOGLE_SERVICE_ACCOUNT_KEY
   embot-core:
     build: "./embot-core"
+    environment:
+      - CALENDAR_INTERFACE_URL=http://google-calendar-interface:3000
   chat-lex-interface:
     build: "./chat-lex-interface"
     environment:

@@ -13,11 +13,13 @@
   "devDependencies": {
     "@types/micro": "^7.3.1",
     "@types/node": "^9.6.0",
+    "@types/node-fetch": "^1.6.7",
     "micro-dev": "^2.2.2",
     "typescript": "^2.7.2"
   },
   "dependencies": {
     "fs-router": "^0.4.1",
-    "micro": "^9.1.4"
+    "micro": "^9.1.4",
+    "node-fetch": "^2.1.2"
   }
 }

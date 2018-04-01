@@ -37,15 +37,74 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 exports.__esModule = true;
 var micro_1 = require("micro");
+var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
+var CALENDAR_URL = process.env.CALENDAR_INTERFACE_URL;
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body;
+    var body, rs;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4, micro_1.json(req)];
             case 1:
                 body = _a.sent();
-                res.end('You triggered the CheckSpecificConferenceRoom Intent!');
+                return [4, calendarRequest(body)];
+            case 2:
+                rs = _a.sent();
+                res.end(rs);
                 return [2];
         }
     });
 }); };
+function calendarRequest(b) {
+    return __awaiter(this, void 0, void 0, function () {
+        var rq, rs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    rq = buildCalendarRequest(b.slots);
+                    return [4, node_fetch_1["default"](rq)];
+                case 1:
+                    rs = _a.sent();
+                    return [2, handleCoreResponse(b.slots.room, rs)];
+            }
+        });
+    });
+}
+function buildCalendarRequest(slots) {
+    return new Fetch.Request(CALENDAR_URL + "/", {
+        method: 'POST',
+        body: JSON.stringify(slots),
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
+function handleCoreResponse(room, rs) {
+    return __awaiter(this, void 0, void 0, function () {
+        var events, firstStartTime, time, nextFreeTime, _i, events_1, e, startTime;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, rs.json()];
+                case 1:
+                    events = _a.sent();
+                    if (events.length === 0) {
+                        return [2, room + " is available all day."];
+                    }
+                    firstStartTime = new Date(events[0].start.dateTime);
+                    if (firstStartTime.valueOf() > Date.now()) {
+                        time = firstStartTime.toLocaleTimeString();
+                        return [2, room + " is available until " + time];
+                    }
+                    nextFreeTime = firstStartTime;
+                    for (_i = 0, events_1 = events; _i < events_1.length; _i++) {
+                        e = events_1[_i];
+                        startTime = new Date(e.start.dateTime);
+                        if (nextFreeTime === startTime) {
+                            nextFreeTime = new Date(e.end.dateTime);
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    return [2, room + " is booked until " + nextFreeTime.toLocaleTimeString()];
+            }
+        });
+    });
+}
