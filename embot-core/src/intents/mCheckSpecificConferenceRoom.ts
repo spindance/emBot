@@ -38,7 +38,7 @@ async function calendarRequest(b: ExpectedInput): Promise<string> {
     const rq = buildCalendarRequest(b.slots)
     const rs = await fetch(rq)
 
-    return handleCoreResponse(b.slots.room, rs)
+    return handleCalendarResponse(b.slots.room, rs)
 }
 
 function buildCalendarRequest(slots: { room: string }): Fetch.Request {
@@ -49,7 +49,7 @@ function buildCalendarRequest(slots: { room: string }): Fetch.Request {
     })
 }
 
-async function handleCoreResponse(room: string, rs: Fetch.Response): Promise<string> {
+async function handleCalendarResponse(room: string, rs: Fetch.Response): Promise<string> {
     const events = await rs.json() as Array<CalendarEvent>
 
     if (events.length === 0) {
@@ -67,8 +67,9 @@ async function handleCoreResponse(room: string, rs: Fetch.Response): Promise<str
     let nextFreeTime: Date = firstStartTime
     for (var e of events) {
         let startTime = new Date(e.start.dateTime)
+        console.log(startTime)
 
-        if (nextFreeTime === startTime) {
+        if (nextFreeTime.valueOf() === startTime.valueOf()) {
             nextFreeTime = new Date(e.end.dateTime)
         } else {
             break

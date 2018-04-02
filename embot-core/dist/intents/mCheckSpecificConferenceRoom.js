@@ -96,7 +96,8 @@ function handleCoreResponse(room, rs) {
                     for (_i = 0, events_1 = events; _i < events_1.length; _i++) {
                         e = events_1[_i];
                         startTime = new Date(e.start.dateTime);
-                        if (nextFreeTime === startTime) {
+                        console.log(startTime);
+                        if (nextFreeTime.valueOf() === startTime.valueOf()) {
                             nextFreeTime = new Date(e.end.dateTime);
                         }
                         else {
