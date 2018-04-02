@@ -84,9 +84,8 @@ function handleCalendarResponse(room, rs) {
                 case 0: return [4, rs.json()];
                 case 1:
                     events = _a.sent();
-                    console.log(JSON.stringify(events));
                     if (events.length === 0) {
-                        return [2, room + " is available all day."];
+                        return [2, room + " is available for the rest of the day."];
                     }
                     firstStartTime = new Date(events[0].start.dateTime);
                     if (firstStartTime.valueOf() > Date.now()) {
