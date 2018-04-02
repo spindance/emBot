@@ -89,7 +89,7 @@ function handleCoreResponse(room, rs) {
                     }
                     firstStartTime = new Date(events[0].start.dateTime);
                     if (firstStartTime.valueOf() > Date.now()) {
-                        time = firstStartTime.toLocaleTimeString();
+                        time = timeInZone(firstStartTime);
                         return [2, room + " is available until " + time];
                     }
                     nextFreeTime = firstStartTime;
@@ -103,8 +103,14 @@ function handleCoreResponse(room, rs) {
                             break;
                         }
                     }
-                    return [2, room + " is booked until " + nextFreeTime.toLocaleTimeString()];
+                    return [2, room + " is booked until " + timeInZone(nextFreeTime)];
             }
         });
+    });
+}
+function timeInZone(d) {
+    return d.toLocaleTimeString('en-US', {
+        timeZone: 'America/New_York',
+        timeZoneName: 'short'
     });
 }

@@ -59,7 +59,7 @@ async function handleCoreResponse(room: string, rs: Fetch.Response): Promise<str
     const firstStartTime = new Date(events[0].start.dateTime)
     if (firstStartTime.valueOf() > Date.now()) {
         // room is currently free
-        const time = firstStartTime.toLocaleTimeString()
+        const time = timeInZone(firstStartTime)
         return `${room} is available until ${time}`
     }
 
@@ -75,5 +75,12 @@ async function handleCoreResponse(room: string, rs: Fetch.Response): Promise<str
         }
     }
 
-    return `${room} is booked until ${nextFreeTime.toLocaleTimeString()}`
+    return `${room} is booked until ${timeInZone(nextFreeTime)}`
+}
+
+function timeInZone(d: Date): string {
+    return d.toLocaleTimeString('en-US', {
+        timeZone: 'America/New_York',
+        timeZoneName: 'short'
+    })
 }
