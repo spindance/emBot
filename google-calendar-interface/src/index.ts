@@ -13,7 +13,7 @@ const CLIENT = new GoogleAuth({
 })
 
 interface expectedInput {
-    roomName?: string
+    room?: string
 }
 
 module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => {
@@ -24,7 +24,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     const eventLists = await Promise.all(
         calendars.items
             .filter(cal => {
-                return body.roomName === undefined || body.roomName === cal.summary
+                return body.room === undefined || body.room === cal.summary
             })
             .map(cal => {
                 return requestEvents(CLIENT, cal)

@@ -64,7 +64,7 @@ function calendarRequest(b) {
                     return [4, node_fetch_1["default"](rq)];
                 case 1:
                     rs = _a.sent();
-                    return [2, handleCoreResponse(b.slots.room, rs)];
+                    return [2, handleCalendarResponse(b.slots.room, rs)];
             }
         });
     });
@@ -76,7 +76,7 @@ function buildCalendarRequest(slots) {
         headers: { 'Content-Type': 'application/json' }
     });
 }
-function handleCoreResponse(room, rs) {
+function handleCalendarResponse(room, rs) {
     return __awaiter(this, void 0, void 0, function () {
         var events, firstStartTime, time, nextFreeTime, _i, events_1, e, startTime;
         return __generator(this, function (_a) {
@@ -84,6 +84,7 @@ function handleCoreResponse(room, rs) {
                 case 0: return [4, rs.json()];
                 case 1:
                     events = _a.sent();
+                    console.log(JSON.stringify(events));
                     if (events.length === 0) {
                         return [2, room + " is available all day."];
                     }
@@ -96,7 +97,6 @@ function handleCoreResponse(room, rs) {
                     for (_i = 0, events_1 = events; _i < events_1.length; _i++) {
                         e = events_1[_i];
                         startTime = new Date(e.start.dateTime);
-                        console.log(startTime);
                         if (nextFreeTime.valueOf() === startTime.valueOf()) {
                             nextFreeTime = new Date(e.end.dateTime);
                         }

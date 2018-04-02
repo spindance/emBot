@@ -51,7 +51,7 @@ function buildCalendarRequest(slots: { room: string }): Fetch.Request {
 
 async function handleCalendarResponse(room: string, rs: Fetch.Response): Promise<string> {
     const events = await rs.json() as Array<CalendarEvent>
-
+    console.log(JSON.stringify(events))
     if (events.length === 0) {
         return `${room} is available all day.`
     }
@@ -67,7 +67,6 @@ async function handleCalendarResponse(room: string, rs: Fetch.Response): Promise
     let nextFreeTime: Date = firstStartTime
     for (var e of events) {
         let startTime = new Date(e.start.dateTime)
-        console.log(startTime)
 
         if (nextFreeTime.valueOf() === startTime.valueOf()) {
             nextFreeTime = new Date(e.end.dateTime)
