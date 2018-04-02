@@ -56,11 +56,13 @@ async function handleCalendarResponse(room: string, rs: Fetch.Response): Promise
         return `${room} is available for the rest of the day.`
     }
 
-    const firstStartTime = new Date(events[0].start.dateTime)
+    const fe = events[0]
+    const firstStartTime = new Date(fe.start.dateTime)
+
     if (firstStartTime.valueOf() > Date.now()) {
         // room is currently free
         const time = timeInZone(firstStartTime)
-        return `${room} is available until ${time}`
+        return `${room} is available until ${time}.`
     }
 
     // room is currently booked
@@ -75,7 +77,7 @@ async function handleCalendarResponse(room: string, rs: Fetch.Response): Promise
         }
     }
 
-    return `${room} is booked until ${timeInZone(nextFreeTime)}`
+    return `${fe.creator.displayName} has booked ${room} for ${fe.summary}. It will be available at ${timeInZone(nextFreeTime)}.`
 }
 
 function timeInZone(d: Date): string {

@@ -78,7 +78,7 @@ function buildCalendarRequest(slots) {
 }
 function handleCalendarResponse(room, rs) {
     return __awaiter(this, void 0, void 0, function () {
-        var events, firstStartTime, time, nextFreeTime, _i, events_1, e, startTime;
+        var events, fe, firstStartTime, time, nextFreeTime, _i, events_1, e, startTime;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4, rs.json()];
@@ -87,10 +87,11 @@ function handleCalendarResponse(room, rs) {
                     if (events.length === 0) {
                         return [2, room + " is available for the rest of the day."];
                     }
-                    firstStartTime = new Date(events[0].start.dateTime);
+                    fe = events[0];
+                    firstStartTime = new Date(fe.start.dateTime);
                     if (firstStartTime.valueOf() > Date.now()) {
                         time = timeInZone(firstStartTime);
-                        return [2, room + " is available until " + time];
+                        return [2, room + " is available until " + time + "."];
                     }
                     nextFreeTime = firstStartTime;
                     for (_i = 0, events_1 = events; _i < events_1.length; _i++) {
@@ -103,7 +104,7 @@ function handleCalendarResponse(room, rs) {
                             break;
                         }
                     }
-                    return [2, room + " is booked until " + timeInZone(nextFreeTime)];
+                    return [2, fe.creator.displayName + " has booked " + room + " for " + fe.summary + ". It will be available at " + timeInZone(nextFreeTime) + "."];
             }
         });
     });
