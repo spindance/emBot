@@ -60,7 +60,10 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 calendars = _a.sent();
                 return [4, Promise.all(calendars.items
                         .filter(function (cal) {
-                        return body.room === undefined || body.room === cal.summary;
+                        if (body.room === undefined) {
+                            return true;
+                        }
+                        return body.room.toLowerCase() === cal.summary.toLowerCase();
                     })
                         .map(function (cal) {
                         return requestEvents(CLIENT, cal);

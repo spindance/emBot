@@ -24,7 +24,11 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     const eventLists = await Promise.all(
         calendars.items
             .filter(cal => {
-                return body.room === undefined || body.room === cal.summary
+                if (body.room === undefined) {
+                    return true
+                }
+
+                return body.room.toLowerCase() === cal.summary.toLowerCase()
             })
             .map(cal => {
                 return requestEvents(CLIENT, cal)
