@@ -13,11 +13,22 @@ services:
   chat-interface:
     build: "./chat-interface"
     environment:
+      - HANGOUTS_SECRET_TOKEN
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
       - AWS_SESSION_TOKEN
-      - CORE_URL=http://embot-core:3000
-      - HANGOUTS_SECRET_TOKEN
+      - AWS_PROFILE
       - LEX_BOT_VERSION=latest
+      - CORE_URL=http://embot-core:3000
     ports:
       - "3000:3000"
+  slack-interface:
+    build: "./slack-interface"
+    environment:
+      - SLACK_API_TOKEN
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_PROFILE
+      - LEX_BOT_VERSION=latest
+      - CORE_URL=http://embot-core:3000
