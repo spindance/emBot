@@ -1,5 +1,5 @@
 {
-  "name": "chat-lex-interface",
+  "name": "chat-interface",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -18,8 +18,9 @@
     "typescript": "^2.7.2"
   },
   "dependencies": {
-    "aws-sdk": "^2.209.0",
+    "aws-sdk": "^2.220.1",
     "micro": "^9.1.4",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "require-env": "^0.2.1"
   }
 }

@@ -1,35 +1,17 @@
-import * as AWS from 'aws-sdk'
-import * as Crypto from 'crypto'
 import * as HTTP from 'http'
 import { json } from 'micro'
 import fetch, * as Fetch from 'node-fetch'
+import * as Env from 'require-env'
 
 import * as Hangouts from './hangouts'
+import * as Lex from './lex'
 const example = require('./hangouts/cardExample')
 
-const SECRET_TOKEN = process.env.HANGOUTS_SECRET_TOKEN
-const LEX_BOT_VERSION = process.env.LEX_BOT_VERSION || 'latest'
-const BOT_CORE_URL = process.env.CORE_URL
+const BOT_CORE_URL = Env.require('CORE_URL')
+const SECRET_TOKEN = Env.require('HANGOUTS_SECRET_TOKEN')
+const LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION')
 
-const lexruntime = new AWS.LexRuntime({
-    region: 'us-east-1'
-})
-
-interface lexInput {
-    botAlias: string,
-    botName: string,
-    userId: string,
-    inputText: string
-}
-
-interface lexOutput {
-    dialogState: string,
-    intentName: string | null,
-    message: string | null,
-    slots?: {
-        [key: string]: string
-    }
-}
+const lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION)
 
 module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => {
     const body = await json(req) as Hangouts.Event
@@ -52,7 +34,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
 
             // for consistency, pretend we got this command from Lex
             let eventID = b.action.parameters.filter(p => p.key === 'eventID')[0].value
-            let lRes: lexOutput = {
+            let lRes: Lex.Output = {
                 dialogState: 'ReadyForFulfillment',
                 intentName: b.action.actionMethodName,
                 message: null,
@@ -76,8 +58,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
                 return
             }
 
-            let params = buildLexParams(b)
-            let lRes = await postLex(params)
+            let lRes = await lexBot.postText(b.message.text, b.message.sender.displayName)
 
             if (lRes.dialogState === 'ReadyForFulfillment') {
                 let rs = await coreRequest(lRes)
@@ -96,41 +77,14 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     }
 }
 
-function buildLexParams(h: Hangouts.MessageEvent): lexInput {
-    /*
-        AWS says userId should be something unique but not personally identifiable.
-        Eventually, we may want to create and persist a user-specific UUID for this,
-        but for now, just hash the user's name.
-     */
-    const hash = Crypto.createHash('sha256')
-    hash.update(h.message.sender.displayName)
-
-    return {
-        botName: 'emBot',
-        botAlias: LEX_BOT_VERSION,
-        userId: hash.digest('hex'),
-        inputText: h.message.text
-    }
-}
-
-function postLex(i: lexInput): Promise<lexOutput> {
-    return new Promise(function (resolve, reject) {
-        lexruntime.postText(i, function (err: AWS.AWSError, data: AWS.LexRuntime.PostTextResponse) {
-            return (err)
-                ? reject(err)
-                : resolve(data as lexOutput)
-        })
-    })
-}
-
-async function coreRequest(l: lexOutput): Promise<string> {
+async function coreRequest(l: Lex.Output): Promise<string> {
     const rq = buildCoreRequest(l)
     const rs = await fetch(rq)
 
     return handleCoreResponse(rs)
 }
 
-function buildCoreRequest(l: lexOutput): Fetch.Request {
+function buildCoreRequest(l: Lex.Output): Fetch.Request {
     const url = `${BOT_CORE_URL}/${l.intentName}`
 
     return new Fetch.Request(url, {

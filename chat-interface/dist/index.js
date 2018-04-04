@@ -36,20 +36,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 exports.__esModule = true;
-var AWS = require("aws-sdk");
-var Crypto = require("crypto");
 var micro_1 = require("micro");
 var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
+var Env = require("require-env");
 var Hangouts = require("./hangouts");
+var Lex = require("./lex");
 var example = require('./hangouts/cardExample');
-var SECRET_TOKEN = process.env.HANGOUTS_SECRET_TOKEN;
-var LEX_BOT_VERSION = process.env.LEX_BOT_VERSION || 'latest';
-var BOT_CORE_URL = process.env.CORE_URL;
-var lexruntime = new AWS.LexRuntime({
-    region: 'us-east-1'
-});
+var BOT_CORE_URL = Env.require('CORE_URL');
+var SECRET_TOKEN = Env.require('HANGOUTS_SECRET_TOKEN');
+var LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION');
+var lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION);
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, _a, b, eventID, lRes, rs, b, params, lRes, rs;
+    var body, _a, b, eventID, lRes, rs, b, lRes, rs;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0: return [4, micro_1.json(req)];
@@ -95,8 +93,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                     res.end(JSON.stringify(example));
                     return [2];
                 }
-                params = buildLexParams(b);
-                return [4, postLex(params)];
+                return [4, lexBot.postText(b.message.text, b.message.sender.displayName)];
             case 6:
                 lRes = _b.sent();
                 if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 8];
@@ -117,25 +114,6 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
         }
     });
 }); };
-function buildLexParams(h) {
-    var hash = Crypto.createHash('sha256');
-    hash.update(h.message.sender.displayName);
-    return {
-        botName: 'emBot',
-        botAlias: LEX_BOT_VERSION,
-        userId: hash.digest('hex'),
-        inputText: h.message.text
-    };
-}
-function postLex(i) {
-    return new Promise(function (resolve, reject) {
-        lexruntime.postText(i, function (err, data) {
-            return (err)
-                ? reject(err)
-                : resolve(data);
-        });
-    });
-}
 function coreRequest(l) {
     return __awaiter(this, void 0, void 0, function () {
         var rq, rs;

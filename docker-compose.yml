@@ -10,13 +10,14 @@ services:
     build: "./embot-core"
     environment:
       - CALENDAR_INTERFACE_URL=http://google-calendar-interface:3000
-  chat-lex-interface:
-    build: "./chat-lex-interface"
+  chat-interface:
+    build: "./chat-interface"
     environment:
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
       - AWS_SESSION_TOKEN
       - CORE_URL=http://embot-core:3000
       - HANGOUTS_SECRET_TOKEN
+      - LEX_BOT_VERSION=latest
     ports:
       - "3000:3000"
