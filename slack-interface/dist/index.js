@@ -35,11 +35,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
 var client_1 = require("@slack/client");
 var Env = require("require-env");
-var token = Env.require('SLACK_API_TOKEN');
-var rtm = new client_1.RTMClient(token);
-var web = new client_1.WebClient(token);
+var Lex = require("./lex");
+var BOT_CORE_URL = Env.require('CORE_URL');
+var LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION');
+var TOKEN = Env.require('SLACK_API_TOKEN');
+var lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION);
+var rtm = new client_1.RTMClient(TOKEN);
+var web = new client_1.WebClient(TOKEN);
 main();
 function main() {
     return __awaiter(this, void 0, void 0, function () {
@@ -93,18 +98,45 @@ function main() {
                             }
                         });
                     }); });
-                    rtm.on('message', function (event) {
-                        if (messageIsForBot(event.text, Bot)) {
-                            rtm.sendTyping(event.channel);
-                            var user_1 = Users.find(function (u) { return u.id === event.user; });
-                            setTimeout(function () {
-                                if (user_1 === undefined) {
-                                    return rtm.sendMessage('Hello. Who are you?', event.channel);
-                                }
-                                rtm.sendMessage("Hello, " + user_1.name, event.channel);
-                            }, 3000);
-                        }
-                    });
+                    rtm.on('message', function (event) { return __awaiter(_this, void 0, void 0, function () {
+                        var user, sanitized, lRes, rs, error_1, garbage;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!messageIsForBot(event.text, Bot)) return [3, 6];
+                                    rtm.sendTyping(event.channel);
+                                    user = Users.find(function (u) { return u.id === event.user; });
+                                    if (user === undefined) {
+                                        return [2, rtm.sendMessage('My mommy told me not to talk to strangers', event.channel)];
+                                    }
+                                    sanitized = event.text
+                                        .replace("<@" + Bot.id + ">", '')
+                                        .replace(Bot.name, '') || 'hello';
+                                    return [4, lexBot.postText(sanitized, user.name)];
+                                case 1:
+                                    lRes = _a.sent();
+                                    if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 5];
+                                    _a.label = 2;
+                                case 2:
+                                    _a.trys.push([2, 4, , 5]);
+                                    return [4, coreRequest(lRes)];
+                                case 3:
+                                    rs = _a.sent();
+                                    return [2, rtm.sendMessage(rs, event.channel)];
+                                case 4:
+                                    error_1 = _a.sent();
+                                    console.log(error_1);
+                                    return [2, rtm.sendMessage('Sorry, I\'m having some networking trouble. Please try again later.', event.channel)];
+                                case 5:
+                                    if (lRes.message == undefined) {
+                                        garbage = JSON.stringify(lRes);
+                                        return [2, rtm.sendMessage("Sorry, Lex send me this garbage: " + garbage, event.channel)];
+                                    }
+                                    return [2, rtm.sendMessage(lRes.message, event.channel)];
+                                case 6: return [2];
+                            }
+                        });
+                    }); });
                     return [2];
             }
         });
@@ -127,6 +159,36 @@ function refreshLocalUsers() {
                     var body = res;
                     return body.members;
                 })];
+        });
+    });
+}
+function coreRequest(l) {
+    return __awaiter(this, void 0, void 0, function () {
+        var rq, rs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    rq = buildCoreRequest(l);
+                    return [4, node_fetch_1["default"](rq)];
+                case 1:
+                    rs = _a.sent();
+                    return [2, handleCoreResponse(rs)];
+            }
+        });
+    });
+}
+function buildCoreRequest(l) {
+    var url = BOT_CORE_URL + "/" + l.intentName;
+    return new Fetch.Request(url, {
+        method: 'POST',
+        body: JSON.stringify(l),
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
+function handleCoreResponse(rs) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2, rs.text()];
         });
     });
 }
