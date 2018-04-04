@@ -1,11 +1,17 @@
+import fetch, * as Fetch from 'node-fetch'
 import { RTMClient, WebClient } from '@slack/client'
 import * as Env from 'require-env'
 
+import * as Lex from './lex'
 import * as Slack from './slack'
 
-const token = Env.require('SLACK_API_TOKEN')
-const rtm = new RTMClient(token)
-const web = new WebClient(token)
+const BOT_CORE_URL = Env.require('CORE_URL')
+const LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION')
+const TOKEN = Env.require('SLACK_API_TOKEN')
+
+const lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION)
+const rtm = new RTMClient(TOKEN)
+const web = new WebClient(TOKEN)
 
 main()
 async function main() {
@@ -33,17 +39,36 @@ async function main() {
         Users = await refreshLocalUsers()
     })
 
-    rtm.on('message', (event: Slack.MessageEvent) => {
+    rtm.on('message', async (event: Slack.MessageEvent) => {
         if (messageIsForBot(event.text, Bot)) {
             rtm.sendTyping(event.channel)
 
             let user = Users.find(u => u.id === event.user)
-            setTimeout(() => {
-                if (user === undefined) {
-                    return rtm.sendMessage('Hello. Who are you?', event.channel)
+
+            if (user === undefined) { // this shouldn't happen
+                return rtm.sendMessage('My mommy told me not to talk to strangers', event.channel)
+            }
+
+            let sanitized = event.text
+                .replace(`<@${Bot.id}>`, '')
+                .replace(Bot.name, '') /* don't send an empty string */ || 'hello'
+            let lRes = await lexBot.postText(sanitized, user.name)
+
+            if (lRes.dialogState === 'ReadyForFulfillment') {
+                try {
+                    let rs = await coreRequest(lRes)
+                    return rtm.sendMessage(rs, event.channel)
                 }
-                rtm.sendMessage(`Hello, ${user.name}`, event.channel)
-            }, 3000)
+                catch (error) {
+                    console.log(error)
+                    return rtm.sendMessage('Sorry, I\'m having some networking trouble. Please try again later.', event.channel)
+                }
+            }
+            if (lRes.message == undefined) { // this shouldn't happen either
+                let garbage = JSON.stringify(lRes)
+                return rtm.sendMessage(`Sorry, Lex send me this garbage: ${garbage}`, event.channel)
+            }
+            return rtm.sendMessage(lRes.message, event.channel)
         }
     })
 }
@@ -65,4 +90,25 @@ async function refreshLocalUsers(): Promise<Array<Slack.User>> {
             let body = res as Slack.UsersListResponse
             return body.members
         })
+}
+
+async function coreRequest(l: Lex.Output): Promise<string> {
+    const rq = buildCoreRequest(l)
+    const rs = await fetch(rq)
+
+    return handleCoreResponse(rs)
+}
+
+function buildCoreRequest(l: Lex.Output): Fetch.Request {
+    const url = `${BOT_CORE_URL}/${l.intentName}`
+
+    return new Fetch.Request(url, {
+        method: 'POST',
+        body: JSON.stringify(l),
+        headers: { 'Content-Type': 'application/json' }
+    })
+}
+
+async function handleCoreResponse(rs: Fetch.Response): Promise<string> {
+    return rs.text()
 }
