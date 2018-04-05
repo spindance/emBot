@@ -43,7 +43,7 @@ async function main() {
         if (messageIsForBot(event.text, Bot)) {
             rtm.sendTyping(event.channel)
 
-            let user = Users.find(u => u.id === event.user)
+            let user = Users.find(u => u.id === event.user) as Slack.Human
 
             if (user === undefined) { // this shouldn't happen
                 return rtm.sendMessage('My mommy told me not to talk to strangers', event.channel)
@@ -55,8 +55,11 @@ async function main() {
             let lRes = await lexBot.postText(sanitized, user.name)
 
             if (lRes.dialogState === 'ReadyForFulfillment') {
+                let email = user.profile.email
+                let channel = event.channel
+
                 try {
-                    let rs = await coreRequest(lRes)
+                    let rs = await coreRequest(lRes, email, channel)
                     return rtm.sendMessage(rs, event.channel)
                 }
                 catch (error) {
@@ -92,19 +95,20 @@ async function refreshLocalUsers(): Promise<Array<Slack.User>> {
         })
 }
 
-async function coreRequest(l: Lex.Output): Promise<string> {
-    const rq = buildCoreRequest(l)
+async function coreRequest(l: Lex.Output, userEmail: string, channel: string): Promise<string> {
+    const rq = buildCoreRequest(l, userEmail, channel)
     const rs = await fetch(rq)
 
     return handleCoreResponse(rs)
 }
 
-function buildCoreRequest(l: Lex.Output): Fetch.Request {
-    const url = `${BOT_CORE_URL}/${l.intentName}`
+function buildCoreRequest(lexOutput: Lex.Output, userEmail: string, channel: string): Fetch.Request {
+    const url = `${BOT_CORE_URL}/${lexOutput.intentName}`
+    const body = { lexOutput, userEmail, channel }
 
     return new Fetch.Request(url, {
         method: 'POST',
-        body: JSON.stringify(l),
+        body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
     })
 }

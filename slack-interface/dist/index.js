@@ -99,7 +99,7 @@ function main() {
                         });
                     }); });
                     rtm.on('message', function (event) { return __awaiter(_this, void 0, void 0, function () {
-                        var user, sanitized, lRes, rs, error_1, garbage;
+                        var user, sanitized, lRes, email, channel, rs, error_1, garbage;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
@@ -116,10 +116,12 @@ function main() {
                                 case 1:
                                     lRes = _a.sent();
                                     if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 5];
+                                    email = user.profile.email;
+                                    channel = event.channel;
                                     _a.label = 2;
                                 case 2:
                                     _a.trys.push([2, 4, , 5]);
-                                    return [4, coreRequest(lRes)];
+                                    return [4, coreRequest(lRes, email, channel)];
                                 case 3:
                                     rs = _a.sent();
                                     return [2, rtm.sendMessage(rs, event.channel)];
@@ -162,13 +164,13 @@ function refreshLocalUsers() {
         });
     });
 }
-function coreRequest(l) {
+function coreRequest(l, userEmail, channel) {
     return __awaiter(this, void 0, void 0, function () {
         var rq, rs;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    rq = buildCoreRequest(l);
+                    rq = buildCoreRequest(l, userEmail, channel);
                     return [4, node_fetch_1["default"](rq)];
                 case 1:
                     rs = _a.sent();
@@ -177,11 +179,12 @@ function coreRequest(l) {
         });
     });
 }
-function buildCoreRequest(l) {
-    var url = BOT_CORE_URL + "/" + l.intentName;
+function buildCoreRequest(lexOutput, userEmail, channel) {
+    var url = BOT_CORE_URL + "/" + lexOutput.intentName;
+    var body = { lexOutput: lexOutput, userEmail: userEmail, channel: channel };
     return new Fetch.Request(url, {
         method: 'POST',
-        body: JSON.stringify(l),
+        body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
     });
 }

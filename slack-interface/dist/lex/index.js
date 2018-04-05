@@ -50,7 +50,6 @@ var LexBot = (function () {
             return __generator(this, function (_a) {
                 params = this.buildParams(inputText, userId);
                 return [2, new Promise(function (resolve, reject) {
-                        console.log(JSON.stringify(params));
                         _this.lexRuntime.postText(params, function (err, data) {
                             return (err)
                                 ? reject(err)
