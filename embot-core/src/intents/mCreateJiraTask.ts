@@ -72,19 +72,20 @@ async function jiraIssueRequest(input: ExpectedInput, user: JiraUser): Promise<J
 }
 
 function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Request {
-    let dueDate = calculateDueDate()
     let body = {
         fields: {
             project: {
-                name: input.lexOutput.slots.project
+                key: input.lexOutput.slots.project
             },
             summary: input.lexOutput.slots.summary,
             description: `"${input.lexOutput.slots.summary}"\n\nIssue created by EmBot`,
-            reporter: user.name,
+            reporter: {
+                name: user.name
+            },
             assignee: {
                 name: 'brucej'
             },
-            issueType: {
+            issuetype: {
                 name: 'Task'
             },
             priority: {
@@ -94,7 +95,7 @@ function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Requ
                 originalEstimate: '1h',
                 remainingEstimate: '1h'
             },
-            duedate: dueDate,
+            duedate: calculateDueDate(),
             customfield_11600: { // SpinDance Project
                 id: '11300' // SD-InternalRequest
             },

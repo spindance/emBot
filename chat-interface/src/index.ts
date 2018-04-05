@@ -25,7 +25,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
 
     switch (body.type) {
         case Hangouts.EventType.ADDED: {
-            res.end('{"text": Thanks for adding me!"}')
+            res.end('{"text": "Thanks for adding me!"}')
             return
         }
 

@@ -116,19 +116,20 @@ function jiraIssueRequest(input, user) {
     });
 }
 function buildJiraIssueRequest(input, user) {
-    var dueDate = calculateDueDate();
     var body = {
         fields: {
             project: {
-                name: input.lexOutput.slots.project
+                key: input.lexOutput.slots.project
             },
             summary: input.lexOutput.slots.summary,
             description: "\"" + input.lexOutput.slots.summary + "\"\n\nIssue created by EmBot",
-            reporter: user.name,
+            reporter: {
+                name: user.name
+            },
             assignee: {
                 name: 'brucej'
             },
-            issueType: {
+            issuetype: {
                 name: 'Task'
             },
             priority: {
@@ -138,7 +139,7 @@ function buildJiraIssueRequest(input, user) {
                 originalEstimate: '1h',
                 remainingEstimate: '1h'
             },
-            duedate: dueDate,
+            duedate: calculateDueDate(),
             customfield_11600: {
                 id: '11300'
             },
@@ -161,6 +162,7 @@ function handleJiraIssueRequest(rs) {
                 case 0: return [4, rs.json()];
                 case 1:
                     issue = _a.sent();
+                    console.log(JSON.stringify(issue));
                     return [2, issue];
             }
         });
