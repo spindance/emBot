@@ -47,7 +47,7 @@ var SECRET_TOKEN = Env.require('HANGOUTS_SECRET_TOKEN');
 var LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION');
 var lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION);
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, _a, b, eventID, lRes, rs, b, lRes, rs;
+    var body, _a, e, eventID, lRes, rs, e, lRes, rs;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0: return [4, micro_1.json(req)];
@@ -72,32 +72,32 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 }
                 _b.label = 3;
             case 3:
-                b = body;
-                eventID = b.action.parameters.filter(function (p) { return p.key === 'eventID'; })[0].value;
+                e = body;
+                eventID = e.action.parameters.filter(function (p) { return p.key === 'eventID'; })[0].value;
                 lRes = {
                     dialogState: 'ReadyForFulfillment',
-                    intentName: b.action.actionMethodName,
+                    intentName: e.action.actionMethodName,
                     message: null,
                     slots: {
                         eventID: eventID
                     }
                 };
-                return [4, coreRequest(lRes)];
+                return [4, coreRequest(lRes, e)];
             case 4:
                 rs = _b.sent();
                 res.end(rs);
                 return [2];
             case 5:
-                b = body;
-                if (b.message.text.includes('zenoss')) {
+                e = body;
+                if (e.message.text.includes('zenoss')) {
                     res.end(JSON.stringify(example));
                     return [2];
                 }
-                return [4, lexBot.postText(b.message.text, b.message.sender.displayName)];
+                return [4, lexBot.postText(e.message.text, e.message.sender.displayName)];
             case 6:
                 lRes = _b.sent();
                 if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 8];
-                return [4, coreRequest(lRes)];
+                return [4, coreRequest(lRes, e)];
             case 7:
                 rs = _b.sent();
                 res.end(rs);
@@ -114,13 +114,13 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
         }
     });
 }); };
-function coreRequest(l) {
+function coreRequest(l, e) {
     return __awaiter(this, void 0, void 0, function () {
         var rq, rs;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    rq = buildCoreRequest(l);
+                    rq = buildCoreRequest(l, e);
                     return [4, node_fetch_1["default"](rq)];
                 case 1:
                     rs = _a.sent();
@@ -129,11 +129,16 @@ function coreRequest(l) {
         });
     });
 }
-function buildCoreRequest(l) {
+function buildCoreRequest(l, e) {
     var url = BOT_CORE_URL + "/" + l.intentName;
+    var body = {
+        userEmail: e.user.email,
+        channel: e.space.displayName,
+        lexOutput: l
+    };
     return new Fetch.Request(url, {
         method: 'POST',
-        body: JSON.stringify(l),
+        body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
     });
 }
