@@ -38,7 +38,8 @@ var _this = this;
 exports.__esModule = true;
 var micro_1 = require("micro");
 var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
-var CALENDAR_URL = process.env.CALENDAR_INTERFACE_URL;
+var Env = require("require-env");
+var CALENDAR_URL = Env.require('CALENDAR_INTERFACE_URL');
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var body, rs;
     return __generator(this, function (_a) {
@@ -60,11 +61,11 @@ function calendarRequest(b) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    rq = buildCalendarRequest(b.slots);
+                    rq = buildCalendarRequest(b.lexOutput.slots);
                     return [4, node_fetch_1["default"](rq)];
                 case 1:
                     rs = _a.sent();
-                    return [2, handleCalendarResponse(b.slots.room, rs)];
+                    return [2, handleCalendarResponse(b.lexOutput.slots.room, rs)];
             }
         });
     });
