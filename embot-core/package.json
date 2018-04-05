@@ -20,6 +20,7 @@
   "dependencies": {
     "fs-router": "^0.4.1",
     "micro": "^9.1.4",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "require-env": "^0.2.1"
   }
 }

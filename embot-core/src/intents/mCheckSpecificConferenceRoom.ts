@@ -1,13 +1,17 @@
 import * as HTTP from 'http'
 import { json } from 'micro'
 import fetch, * as Fetch from 'node-fetch'
+import * as Env from 'require-env'
 
-const CALENDAR_URL = process.env.CALENDAR_INTERFACE_URL
+const CALENDAR_URL = Env.require('CALENDAR_INTERFACE_URL')
 
-// same as lexOutput in chat-lex-interface
 interface ExpectedInput {
-    slots: {
-        room: string
+    userEmail: string,
+    channel: string,
+    lexOutput: {
+        slots: {
+            room: string
+        }
     }
 }
 
@@ -35,10 +39,10 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
 }
 
 async function calendarRequest(b: ExpectedInput): Promise<string> {
-    const rq = buildCalendarRequest(b.slots)
+    const rq = buildCalendarRequest(b.lexOutput.slots)
     const rs = await fetch(rq)
 
-    return handleCalendarResponse(b.slots.room, rs)
+    return handleCalendarResponse(b.lexOutput.slots.room, rs)
 }
 
 function buildCalendarRequest(slots: { room: string }): Fetch.Request {
