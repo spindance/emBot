@@ -10,6 +10,9 @@ services:
     build: "./embot-core"
     environment:
       - CALENDAR_INTERFACE_URL=http://google-calendar-interface:3000
+      - JIRA_BASE_URL=https://spindance.atlassian.net
+      - JIRA_USERNAME=jiraApps
+      - JIRA_PASSWORD
   chat-interface:
     build: "./chat-interface"
     environment:
