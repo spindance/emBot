@@ -162,7 +162,6 @@ function handleJiraIssueRequest(rs) {
                 case 0: return [4, rs.json()];
                 case 1:
                     issue = _a.sent();
-                    console.log(JSON.stringify(issue));
                     return [2, issue];
             }
         });
