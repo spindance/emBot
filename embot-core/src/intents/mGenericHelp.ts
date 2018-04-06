@@ -14,11 +14,11 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     switch (body.lexOutput.slots.topic) {
         case 'Jira':
         case 'IT':
-            res.end('I can create Jira tasks for IT support if you say *create IT ticket* and then describe the task.')
+            res.end('I can create Jira tasks for IT support if you say ```create IT ticket``` and then describe the task.')
             return
 
         case 'Calendar':
-            res.end('If you ask *is anyone in <conference room>*, I can tell you if a room is available.')
+            res.end('If you ask eg. ```is anyone in Missile Command?``` I can tell you if the room is available.')
             return
 
         default:

@@ -47,10 +47,10 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 switch (body.lexOutput.slots.topic) {
                     case 'Jira':
                     case 'IT':
-                        res.end('I can create Jira tasks for IT support if you say *create IT ticket* and then describe the task.');
+                        res.end('I can create Jira tasks for IT support if you say ```create IT ticket``` and then describe the task.');
                         return [2];
                     case 'Calendar':
-                        res.end('If you ask *is anyone in <conference room>*, I can tell you if a room is available.');
+                        res.end('If you ask eg. ```is anyone in Missile Command?``` I can tell you if the room is available.');
                         return [2];
                     default:
                         res.end('You triggered the GenericHelp Intent!');
