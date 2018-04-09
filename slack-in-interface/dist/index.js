@@ -42,8 +42,9 @@ var Env = require("require-env");
 var client_1 = require("@slack/client");
 var Lex = require("./lex");
 var BOT_CORE_URL = Env.require('CORE_URL');
-var SECRET_TOKEN = Env.require('SLACK_SECRET_TOKEN');
+var SLACK_OUT_URL = Env.require('SLACK_OUT_URL');
 var LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION');
+var SECRET_TOKEN = Env.require('SLACK_SECRET_TOKEN');
 var API_TOKEN = Env.require('SLACK_API_TOKEN');
 var lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION);
 var slackWeb = new client_1.WebClient(API_TOKEN);
@@ -64,7 +65,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                     case 'interactive_message': return [3, 3];
                     case 'event_callback': return [3, 4];
                 }
-                return [3, 9];
+                return [3, 10];
             case 2:
                 micro_1.send(res, 200, { challenge: body.challenge });
                 return [2];
@@ -76,19 +77,22 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 return [4, lexBot.postText(msg.event.text, msg.event.user)];
             case 5:
                 lRes = _b.sent();
-                if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 8];
+                if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 9];
+                micro_1.send(res, 200);
                 return [4, lookupSlackEmail(msg.event.user)];
             case 6:
                 email = _b.sent();
                 return [4, coreRequest(lRes, email, '')];
             case 7:
                 rs = _b.sent();
-                res.end(JSON.stringify({ text: rs }));
-                return [2];
+                return [4, slackOutRequest(msg.event.channel, rs)];
             case 8:
+                _b.sent();
+                return [2];
+            case 9:
                 res.end(JSON.stringify({ text: lRes.message }));
                 return [2];
-            case 9: return [2];
+            case 10: return [2];
         }
     });
 }); };
@@ -132,5 +136,29 @@ function handleCoreResponse(rs) {
         return __generator(this, function (_a) {
             return [2, rs.text()];
         });
+    });
+}
+function slackOutRequest(channel, text) {
+    return __awaiter(this, void 0, void 0, function () {
+        var rq, rs;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    rq = buildSlackOutRequest(channel, text);
+                    return [4, node_fetch_1["default"](rq)];
+                case 1:
+                    rs = _a.sent();
+                    return [2, rs.ok];
+            }
+        });
+    });
+}
+function buildSlackOutRequest(channel, text) {
+    var url = SLACK_OUT_URL;
+    var body = { channel: channel, text: text };
+    return new Fetch.Request(url, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' }
     });
 }
