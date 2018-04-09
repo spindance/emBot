@@ -27,7 +27,7 @@ services:
       - "3000:3000"
   slack-in-interface:
     build: "./slack-in-interface"
-    environemt:
+    environment:
       - SLACK_API_TOKEN
       - SLACK_SECRET_TOKEN
       - AWS_ACCESS_KEY_ID
@@ -36,15 +36,10 @@ services:
       - AWS_PROFILE
       - LEX_BOT_VERSION=latest
       - CORE_URL=http://embot-core:3000
+      - SLACK_OUT_URL=http://slack-out-interface:3000
     ports:
       - "3001:3000"
-  slack-interface:
-    build: "./slack-interface"
+  slack-out-interface:
+    build: "./slack-out-interface"
     environment:
       - SLACK_API_TOKEN
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_SESSION_TOKEN
-      - AWS_PROFILE
-      - LEX_BOT_VERSION=latest
-      - CORE_URL=http://embot-core:3000

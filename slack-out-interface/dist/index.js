@@ -34,41 +34,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var _this = this;
 exports.__esModule = true;
-var AWS = require("aws-sdk");
-var Crypto = require("crypto");
-var LexBot = (function () {
-    function LexBot(name, alias) {
-        this.name = name;
-        this.alias = alias;
-        this.lexRuntime = new AWS.LexRuntime({ region: 'us-east-1' });
-    }
-    LexBot.prototype.postText = function (inputText, userId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var params;
-            return __generator(this, function (_a) {
-                params = this.buildParams(inputText, userId);
-                return [2, new Promise(function (resolve, reject) {
-                        _this.lexRuntime.postText(params, function (err, data) {
-                            return (err)
-                                ? reject(err)
-                                : resolve(data);
-                        });
-                    })];
-            });
-        });
-    };
-    LexBot.prototype.buildParams = function (inputText, userId) {
-        var hash = Crypto.createHash('sha256');
-        hash.update(userId);
-        return {
-            botAlias: this.alias,
-            botName: this.name,
-            userId: hash.digest('hex'),
-            inputText: inputText
-        };
-    };
-    return LexBot;
-}());
-exports.LexBot = LexBot;
+var micro_1 = require("micro");
+var Env = require("require-env");
+var client_1 = require("@slack/client");
+var API_TOKEN = Env.require('SLACK_API_TOKEN');
+var slackWeb = new client_1.WebClient(API_TOKEN);
+module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    var body, slackOptions, link;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4, micro_1.json(req)];
+            case 1:
+                body = _a.sent();
+                switch (body.type) {
+                    case 'plain_text':
+                        slackOptions = {
+                            channel: body.channel,
+                            text: body.text
+                        };
+                        break;
+                    case 'link_message':
+                        link = body.link;
+                        slackOptions = {
+                            channel: body.channel,
+                            text: link.title,
+                            attachments: [{
+                                    title: link.link_text,
+                                    title_link: link.link_target,
+                                    text: link.summary,
+                                    color: "#7CD197"
+                                }]
+                        };
+                        break;
+                }
+                slackWeb.chat.postMessage(slackOptions).then(function (rs) {
+                    if (rs.ok) {
+                        res.end('ok');
+                        return;
+                    }
+                    micro_1.send(res, 500, rs.error);
+                });
+                return [2];
+        }
+    });
+}); };

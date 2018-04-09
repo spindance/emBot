@@ -8,8 +8,9 @@ import * as Lex from './lex'
 import * as Slack from './slack'
 
 const BOT_CORE_URL = Env.require('CORE_URL')
-const SECRET_TOKEN = Env.require('SLACK_SECRET_TOKEN')
+const SLACK_OUT_URL = Env.require('SLACK_OUT_URL')
 const LEX_BOT_VERSION = Env.require('LEX_BOT_VERSION')
+const SECRET_TOKEN = Env.require('SLACK_SECRET_TOKEN')
 const API_TOKEN = Env.require('SLACK_API_TOKEN')
 
 const lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION)
@@ -37,7 +38,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             return
         case 'event_callback':
             // someone is talking to us
-            // send(res, 200)
+            send(res, 200)
             let msg = body as Slack.EventCallback
             let lRes = await lexBot.postText(msg.event.text, msg.event.user)
 
@@ -45,7 +46,8 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
                 // find email based on userID
                 let email = await lookupSlackEmail(msg.event.user)
                 let rs = await coreRequest(lRes, email, '')
-                res.end(JSON.stringify({ text: rs }))
+
+                await slackOutRequest(msg.event.channel, rs)
                 return
             }
 
@@ -83,4 +85,22 @@ function buildCoreRequest(lexOutput: Lex.Output, userEmail: string, channel: str
 
 async function handleCoreResponse(rs: Fetch.Response): Promise<string> {
     return rs.text()
+}
+
+async function slackOutRequest(channel: string, text: string): Promise<boolean> {
+    const rq = buildSlackOutRequest(channel, text)
+    const rs = await fetch(rq)
+
+    return rs.ok
+}
+
+function buildSlackOutRequest(channel: string, text: string): Fetch.Request {
+    const url = SLACK_OUT_URL
+    const body = { channel, text }
+
+    return new Fetch.Request(url, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' }
+    })
 }
