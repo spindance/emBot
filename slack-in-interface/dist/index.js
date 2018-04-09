@@ -78,7 +78,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
             case 5:
                 lRes = _b.sent();
                 if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 9];
-                micro_1.send(res, 200);
+                res.end();
                 return [4, lookupSlackEmail(msg.event.user)];
             case 6:
                 email = _b.sent();

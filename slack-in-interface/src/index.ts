@@ -42,7 +42,8 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             let lRes = await lexBot.postText(msg.event.text, msg.event.user)
 
             if (lRes.dialogState === 'ReadyForFulfillment') {
-                send(res, 200)
+                res.end()
+                // send(res, 200)
                 // find email based on userID
                 let email = await lookupSlackEmail(msg.event.user)
                 let rs = await coreRequest(lRes, email, '')
