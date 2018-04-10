@@ -41,7 +41,7 @@ var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
 var Env = require("require-env");
 var CALENDAR_URL = Env.require('CALENDAR_INTERFACE_URL');
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, rs;
+    var body, text;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4, micro_1.json(req)];
@@ -49,8 +49,8 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 body = _a.sent();
                 return [4, calendarRequest(body)];
             case 2:
-                rs = _a.sent();
-                res.end(rs);
+                text = _a.sent();
+                micro_1.send(res, 200, { type: 'plain_text', text: text });
                 return [2];
         }
     });

@@ -56,9 +56,15 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 return [4, jiraIssueRequest(input, user)];
             case 3:
                 issue = _a.sent();
-                res.end('Here is the issue I created: ```' +
-                    (JIRA_BASE_URL + "/browse/" + issue.key) +
-                    '```');
+                micro_1.send(res, 200, {
+                    type: 'link_message',
+                    link: {
+                        title: input.lexOutput.slots.project + " Request from " + user,
+                        link_text: issue.key,
+                        link_target: JIRA_BASE_URL + "/browse/" + issue.key,
+                        summary: input.lexOutput.slots.summary
+                    }
+                });
                 return [2];
         }
     });

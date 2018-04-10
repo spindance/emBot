@@ -100,6 +100,48 @@ function buildCoreRequest(l: Lex.Output, e: Hangouts.Event): Fetch.Request {
 }
 
 async function handleCoreResponse(rs: Fetch.Response): Promise<string> {
-    return rs.text()
-        .then(t => JSON.stringify({ text: t }))
+    let r: CoreResponse = await rs.json()
+    switch (r.type) {
+        case 'link_message':
+            let link = (r as LinkMessage).link
+            return JSON.stringify({
+                cards: [{
+                    sections: [{
+                        widgets: [{
+                            keyValue: {
+                                icon: 'DESCRIPTION',
+                                topLabel: link.title,
+                                content: link.link_text,
+                                bottomLabel: link.summary,
+                                onClick: {
+                                    openLink: {
+                                        url: link.link_target
+                                    }
+                                }
+                            }
+                        }]
+                    }]
+                }]
+            })
+        default:
+            let text = (r as PlainText).text
+            return JSON.stringify({ text })
+    }
+}
+
+type CoreResponse = PlainText | LinkMessage
+
+interface PlainText {
+    type: string, // "plain_text"
+    text: string
+}
+
+interface LinkMessage {
+    type: string, // "link_message"
+    link: {
+        title: string,
+        link_text: string,
+        link_target: string,
+        summary: string
+    }
 }

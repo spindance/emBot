@@ -1,6 +1,6 @@
 import * as Base64 from 'base-64'
 import * as HTTP from 'http'
-import { json } from 'micro'
+import { json, send } from 'micro'
 import fetch, * as Fetch from 'node-fetch'
 import * as Env from 'require-env'
 
@@ -34,10 +34,15 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     let user = await jiraUserRequest(input.userEmail)
     let issue = await jiraIssueRequest(input, user)
 
-    res.end('Here is the issue I created: ```' +
-        `${JIRA_BASE_URL}/browse/${issue.key}` +
-        '```')
-    return
+    send(res, 200, {
+        type: 'link_message',
+        link: {
+            title: `${input.lexOutput.slots.project} Request from ${user}`,
+            link_text: issue.key,
+            link_target: `${JIRA_BASE_URL}/browse/${issue.key}`,
+            summary: input.lexOutput.slots.summary
+        }
+    })
 }
 
 async function jiraUserRequest(email: string): Promise<JiraUser> {

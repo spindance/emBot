@@ -138,17 +138,17 @@ function buildCoreRequest(lexOutput, userEmail, channel) {
 function handleCoreResponse(rs) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            return [2, rs.text()];
+            return [2, rs.json()];
         });
     });
 }
-function slackOutRequest(channel, text) {
+function slackOutRequest(channel, input) {
     return __awaiter(this, void 0, void 0, function () {
         var rq, rs;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    rq = buildSlackOutRequest(channel, text);
+                    rq = buildSlackOutRequest(channel, input);
                     return [4, node_fetch_1["default"](rq)];
                 case 1:
                     rs = _a.sent();
@@ -157,9 +157,15 @@ function slackOutRequest(channel, text) {
         });
     });
 }
-function buildSlackOutRequest(channel, text) {
+function buildSlackOutRequest(channel, input) {
     var url = SLACK_OUT_URL;
-    var body = { type: 'plain_text', channel: channel, text: text };
+    var body;
+    if (typeof input === 'string') {
+        body = { type: 'plain_text', channel: channel, text: input };
+    }
+    else {
+        body = input;
+    }
     return new Fetch.Request(url, {
         method: 'POST',
         body: JSON.stringify(body),

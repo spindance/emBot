@@ -66,7 +66,7 @@ async function lookupSlackEmail(userID: string): Promise<string> {
         })
 }
 
-async function coreRequest(l: Lex.Output, userEmail: string, channel: string): Promise<string> {
+async function coreRequest(l: Lex.Output, userEmail: string, channel: string): Promise<CoreResponse> {
     const rq = buildCoreRequest(l, userEmail, channel)
     const rs = await fetch(rq)
 
@@ -84,24 +84,47 @@ function buildCoreRequest(lexOutput: Lex.Output, userEmail: string, channel: str
     })
 }
 
-async function handleCoreResponse(rs: Fetch.Response): Promise<string> {
-    return rs.text()
+async function handleCoreResponse(rs: Fetch.Response): Promise<CoreResponse> {
+    return rs.json()
 }
 
-async function slackOutRequest(channel: string, text: string): Promise<boolean> {
-    const rq = buildSlackOutRequest(channel, text)
+async function slackOutRequest(channel: string, input: string | CoreResponse): Promise<boolean> {
+    const rq = buildSlackOutRequest(channel, input)
     const rs = await fetch(rq)
 
     return rs.ok
 }
 
-function buildSlackOutRequest(channel: string, text: string): Fetch.Request {
+function buildSlackOutRequest(channel: string, input: string | CoreResponse): Fetch.Request {
     const url = SLACK_OUT_URL
-    const body = { type: 'plain_text', channel, text }
+
+    let body: any
+    if (typeof input === 'string') {
+        body = { type: 'plain_text', channel, text: input }
+    } else {
+        body = input
+    }
 
     return new Fetch.Request(url, {
         method: 'POST',
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
     })
+}
+
+type CoreResponse = PlainText | LinkMessage
+
+interface PlainText {
+    type: string, // "plain_text"
+    text: string
+}
+
+interface LinkMessage {
+    type: string, // "link_message"
+    link: {
+        title: string,
+        link_text: string,
+        link_target: string,
+        summary: string
+    }
 }

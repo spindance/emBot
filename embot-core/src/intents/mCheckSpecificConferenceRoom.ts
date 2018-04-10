@@ -1,5 +1,5 @@
 import * as HTTP from 'http'
-import { json } from 'micro'
+import { json, send } from 'micro'
 import fetch, * as Fetch from 'node-fetch'
 import * as Env from 'require-env'
 
@@ -32,10 +32,9 @@ interface CalendarEvent {
 
 module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => {
     let body = await json(req)
-    let rs = await calendarRequest(body as ExpectedInput)
+    let text = await calendarRequest(body as ExpectedInput)
 
-    res.end(rs)
-    return
+    send(res, 200, { type: 'plain_text', text })
 }
 
 async function calendarRequest(b: ExpectedInput): Promise<string> {

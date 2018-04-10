@@ -38,7 +38,7 @@ var _this = this;
 exports.__esModule = true;
 var micro_1 = require("micro");
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body;
+    var body, text;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4, micro_1.json(req)];
@@ -47,14 +47,16 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 switch (body.lexOutput.slots.topic) {
                     case 'Jira':
                     case 'IT':
-                        res.end('I can create Jira tasks for IT support if you say ```create IT ticket``` and then describe the task.');
-                        return [2];
+                        text = 'I can create Jira tasks for IT support if you say ```create IT ticket``` and then describe the task.';
+                        break;
                     case 'Calendar':
-                        res.end('If you ask eg. ```is anyone in Missile Command?``` I can tell you if the room is available.');
-                        return [2];
+                        text = 'If you ask eg. ```is anyone in Missile Command?``` I can tell you if the room is available.';
+                        break;
                     default:
-                        res.end('You triggered the GenericHelp Intent!');
+                        text = 'You triggered the GenericHelp Intent!';
+                        break;
                 }
+                micro_1.send(res, 200, { type: 'plain_text', text: text });
                 return [2];
         }
     });

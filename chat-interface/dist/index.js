@@ -67,7 +67,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 return [3, 9];
             case 2:
                 {
-                    res.end('{"text": Thanks for adding me!"}');
+                    res.end('{"text": "Thanks for adding me!"}');
                     return [2];
                 }
                 _b.label = 3;
@@ -144,9 +144,49 @@ function buildCoreRequest(l, e) {
 }
 function handleCoreResponse(rs) {
     return __awaiter(this, void 0, void 0, function () {
+        var r, link, text, e_1, text;
         return __generator(this, function (_a) {
-            return [2, rs.text()
-                    .then(function (t) { return JSON.stringify({ text: t }); })];
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 4]);
+                    return [4, rs.json()];
+                case 1:
+                    r = _a.sent();
+                    switch (r.type) {
+                        case 'link_message':
+                            link = r.link;
+                            return [2, JSON.stringify({
+                                    cards: [{
+                                            sections: [{
+                                                    widgets: [{
+                                                            keyValue: {
+                                                                icon: 'DESCRIPTION',
+                                                                topLabel: link.title,
+                                                                content: link.link_text,
+                                                                bottomLabel: link.summary,
+                                                                onClick: {
+                                                                    openLink: {
+                                                                        url: link.link_target
+                                                                    }
+                                                                }
+                                                            }
+                                                        }]
+                                                }]
+                                        }]
+                                })];
+                        default:
+                            text = r.text;
+                            return [2, JSON.stringify({ text: text })];
+                    }
+                    return [3, 4];
+                case 2:
+                    e_1 = _a.sent();
+                    return [4, rs.text()];
+                case 3:
+                    text = _a.sent();
+                    return [2, JSON.stringify({ text: text })];
+                case 4: return [2];
+            }
         });
     });
 }
