@@ -102,7 +102,7 @@ function buildSlackOutRequest(channel: string, input: string | CoreResponse): Fe
     if (typeof input === 'string') {
         body = { type: 'plain_text', channel, text: input }
     } else {
-        body = input
+        body = Object.assign({ channel }, input)
     }
 
     return new Fetch.Request(url, {

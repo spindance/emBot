@@ -164,7 +164,7 @@ function buildSlackOutRequest(channel, input) {
         body = { type: 'plain_text', channel: channel, text: input };
     }
     else {
-        body = input;
+        body = Object.assign({ channel: channel }, input);
     }
     return new Fetch.Request(url, {
         method: 'POST',
