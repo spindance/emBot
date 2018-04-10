@@ -16,7 +16,7 @@ const API_TOKEN = Env.require('SLACK_API_TOKEN')
 const lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION)
 const slackWeb = new WebClient(API_TOKEN)
 
-module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => {
+module.exports = async function main(req: HTTP.IncomingMessage, res: HTTP.ServerResponse) {
     const body = await json(req) as Slack.Event
 
     // validate request is coming from Slack
