@@ -96,7 +96,7 @@ async function slackOutRequest(channel: string, text: string): Promise<boolean> 
 
 function buildSlackOutRequest(channel: string, text: string): Fetch.Request {
     const url = SLACK_OUT_URL
-    const body = { channel, text }
+    const body = { type: 'plain_text', channel, text }
 
     return new Fetch.Request(url, {
         method: 'POST',
