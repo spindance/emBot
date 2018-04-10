@@ -29,7 +29,8 @@ interface JiraUser {
 
 module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => {
     let input = await json(req) as ExpectedInput
-
+    let summary = input.lexOutput.slots.summary
+        .replace('@emBot ', '')
 
     let user = await jiraUserRequest(input.userEmail)
     let issue = await jiraIssueRequest(input, user)
@@ -37,7 +38,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     send(res, 200, {
         type: 'link_message',
         link: {
-            title: `${input.lexOutput.slots.project} Request from ${user}`,
+            title: `${input.lexOutput.slots.project} Request from ${user.name}`,
             link_text: issue.key,
             link_target: `${JIRA_BASE_URL}/browse/${issue.key}`,
             summary: input.lexOutput.slots.summary

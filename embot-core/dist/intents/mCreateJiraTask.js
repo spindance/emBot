@@ -44,12 +44,14 @@ var JIRA_BASE_URL = Env.require('JIRA_BASE_URL');
 var JIRA_USERNAME = Env.require('JIRA_USERNAME');
 var JIRA_PASSWORD = Env.require('JIRA_PASSWORD');
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var input, user, issue;
+    var input, summary, user, issue;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4, micro_1.json(req)];
             case 1:
                 input = _a.sent();
+                summary = input.lexOutput.slots.summary
+                    .replace('@emBot ', '');
                 return [4, jiraUserRequest(input.userEmail)];
             case 2:
                 user = _a.sent();
@@ -59,7 +61,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 micro_1.send(res, 200, {
                     type: 'link_message',
                     link: {
-                        title: input.lexOutput.slots.project + " Request from " + user,
+                        title: input.lexOutput.slots.project + " Request from " + user.name,
                         link_text: issue.key,
                         link_target: JIRA_BASE_URL + "/browse/" + issue.key,
                         summary: input.lexOutput.slots.summary

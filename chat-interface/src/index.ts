@@ -105,12 +105,13 @@ async function handleCoreResponse(rs: Fetch.Response): Promise<string> {
         case 'link_message':
             let link = (r as LinkMessage).link
             return JSON.stringify({
+                header: {
+                    title: link.title
+                },
                 cards: [{
                     sections: [{
                         widgets: [{
                             keyValue: {
-                                icon: 'DESCRIPTION',
-                                topLabel: link.title,
                                 content: link.link_text,
                                 bottomLabel: link.summary,
                                 onClick: {
