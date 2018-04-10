@@ -68,13 +68,16 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 return [3, 11];
             case 2:
                 micro_1.send(res, 200, { challenge: body.challenge });
-                return [3, 12];
+                return [3, 11];
             case 3:
                 micro_1.send(res, 200);
-                return [3, 12];
+                return [3, 11];
             case 4:
                 micro_1.send(res, 200);
                 msg = body;
+                if (msg.event.subtype === 'bot_message') {
+                    return [2];
+                }
                 return [4, lexBot.postText(msg.event.text, msg.event.user)];
             case 5:
                 lRes = _b.sent();
@@ -93,10 +96,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
             case 10:
                 _b.sent();
                 _b.label = 11;
-            case 11:
-                micro_1.send(res, 200);
-                _b.label = 12;
-            case 12: return [2];
+            case 11: return [2];
         }
     });
 }); };

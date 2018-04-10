@@ -33,6 +33,7 @@ export interface EventCallback {
     team_id: string,
     event: {
         type: string, // "app_mention" or "message"
+        subtype?: string,
         user: string, // like "U061F7AUR"
         text: string,
         channel: string // like "C0LAN2Q65"

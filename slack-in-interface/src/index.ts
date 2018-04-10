@@ -40,6 +40,10 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             // someone is talking to us
             send(res, 200)
             let msg = body as Slack.EventCallback
+
+            if (msg.event.subtype === 'bot_message') {
+                return
+            }
             let lRes = await lexBot.postText(msg.event.text, msg.event.user)
 
             if (lRes.dialogState === 'ReadyForFulfillment') {
@@ -51,8 +55,6 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             } else {
                 await slackOutRequest(msg.event.channel, lRes.message as string)
             }
-        default:
-            send(res, 200)
     }
 }
 
