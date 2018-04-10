@@ -34,6 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var _this = this;
 exports.__esModule = true;
 var node_fetch_1 = require("node-fetch"), Fetch = node_fetch_1;
 var micro_1 = require("micro");
@@ -47,57 +48,58 @@ var SECRET_TOKEN = Env.require('SLACK_SECRET_TOKEN');
 var API_TOKEN = Env.require('SLACK_API_TOKEN');
 var lexBot = new Lex.LexBot('emBot', LEX_BOT_VERSION);
 var slackWeb = new client_1.WebClient(API_TOKEN);
-module.exports = function main(req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var body, _a, msg, lRes, email, rs;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4, micro_1.json(req)];
-                case 1:
-                    body = _b.sent();
-                    if (body.token !== SECRET_TOKEN) {
-                        micro_1.send(res, 403, 'unauthorized');
-                        return [2];
-                    }
-                    _a = body.type;
-                    switch (_a) {
-                        case 'url_verification': return [3, 2];
-                        case 'interactive_message': return [3, 3];
-                        case 'event_callback': return [3, 4];
-                    }
-                    return [3, 11];
-                case 2:
-                    micro_1.send(res, 200, { challenge: body.challenge });
-                    return [3, 11];
-                case 3:
-                    micro_1.send(res, 200);
-                    return [3, 11];
-                case 4:
-                    micro_1.send(res, 200);
-                    msg = body;
-                    return [4, lexBot.postText(msg.event.text, msg.event.user)];
-                case 5:
-                    lRes = _b.sent();
-                    if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 9];
-                    return [4, lookupSlackEmail(msg.event.user)];
-                case 6:
-                    email = _b.sent();
-                    return [4, coreRequest(lRes, email, '')];
-                case 7:
-                    rs = _b.sent();
-                    return [4, slackOutRequest(msg.event.channel, rs)];
-                case 8:
-                    _b.sent();
-                    return [3, 11];
-                case 9: return [4, slackOutRequest(msg.event.channel, lRes.message)];
-                case 10:
-                    _b.sent();
-                    _b.label = 11;
-                case 11: return [2];
-            }
-        });
+module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    var body, _a, msg, lRes, email, rs;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4, micro_1.json(req)];
+            case 1:
+                body = _b.sent();
+                if (body.token !== SECRET_TOKEN) {
+                    micro_1.send(res, 403, 'unauthorized');
+                    return [2];
+                }
+                _a = body.type;
+                switch (_a) {
+                    case 'url_verification': return [3, 2];
+                    case 'interactive_message': return [3, 3];
+                    case 'event_callback': return [3, 4];
+                }
+                return [3, 11];
+            case 2:
+                micro_1.send(res, 200, { challenge: body.challenge });
+                return [3, 12];
+            case 3:
+                micro_1.send(res, 200);
+                return [3, 12];
+            case 4:
+                micro_1.send(res, 200);
+                msg = body;
+                return [4, lexBot.postText(msg.event.text, msg.event.user)];
+            case 5:
+                lRes = _b.sent();
+                if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 9];
+                return [4, lookupSlackEmail(msg.event.user)];
+            case 6:
+                email = _b.sent();
+                return [4, coreRequest(lRes, email, '')];
+            case 7:
+                rs = _b.sent();
+                return [4, slackOutRequest(msg.event.channel, rs)];
+            case 8:
+                _b.sent();
+                return [3, 11];
+            case 9: return [4, slackOutRequest(msg.event.channel, lRes.message)];
+            case 10:
+                _b.sent();
+                _b.label = 11;
+            case 11:
+                micro_1.send(res, 200);
+                _b.label = 12;
+            case 12: return [2];
+        }
     });
-};
+}); };
 function lookupSlackEmail(userID) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
