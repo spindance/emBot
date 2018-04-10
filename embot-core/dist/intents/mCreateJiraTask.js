@@ -110,16 +110,8 @@ function handleJiraUserResponse(rs) {
 }
 function jiraIssueRequest(input, user) {
     return __awaiter(this, void 0, void 0, function () {
-        var rq, rs;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    rq = buildJiraIssueRequest(input, user);
-                    return [4, node_fetch_1["default"](rq)];
-                case 1:
-                    rs = _a.sent();
-                    return [2, handleJiraIssueRequest(rs)];
-            }
+            return [2, handleJiraIssueRequest()];
         });
     });
 }
@@ -162,16 +154,12 @@ function buildJiraIssueRequest(input, user) {
         body: JSON.stringify(body)
     });
 }
-function handleJiraIssueRequest(rs) {
+function handleJiraIssueRequest() {
     return __awaiter(this, void 0, void 0, function () {
-        var issue;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, rs.json()];
-                case 1:
-                    issue = _a.sent();
-                    return [2, issue];
-            }
+            return [2, Promise.resolve({
+                    key: 'Dummy-123'
+                })];
         });
     });
 }
