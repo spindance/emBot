@@ -65,7 +65,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                     case 'interactive_message': return [3, 3];
                     case 'event_callback': return [3, 4];
                 }
-                return [3, 10];
+                return [3, 11];
             case 2:
                 micro_1.send(res, 200, { challenge: body.challenge });
                 return [2];
@@ -73,12 +73,12 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 micro_1.send(res, 200);
                 return [2];
             case 4:
+                micro_1.send(res, 200);
                 msg = body;
                 return [4, lexBot.postText(msg.event.text, msg.event.user)];
             case 5:
                 lRes = _b.sent();
                 if (!(lRes.dialogState === 'ReadyForFulfillment')) return [3, 9];
-                res.end();
                 return [4, lookupSlackEmail(msg.event.user)];
             case 6:
                 email = _b.sent();
@@ -89,10 +89,11 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
             case 8:
                 _b.sent();
                 return [2];
-            case 9:
-                res.end(JSON.stringify({ text: lRes.message }));
+            case 9: return [4, slackOutRequest(msg.event.channel, lRes.message)];
+            case 10:
+                _b.sent();
                 return [2];
-            case 10: return [2];
+            case 11: return [2];
         }
     });
 }); };

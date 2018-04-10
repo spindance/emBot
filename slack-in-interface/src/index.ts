@@ -38,12 +38,11 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             return
         case 'event_callback':
             // someone is talking to us
+            send(res, 200)
             let msg = body as Slack.EventCallback
             let lRes = await lexBot.postText(msg.event.text, msg.event.user)
 
             if (lRes.dialogState === 'ReadyForFulfillment') {
-                res.end()
-                // send(res, 200)
                 // find email based on userID
                 let email = await lookupSlackEmail(msg.event.user)
                 let rs = await coreRequest(lRes, email, '')
@@ -53,7 +52,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             }
 
             // else
-            res.end(JSON.stringify({ text: lRes.message }))
+            await slackOutRequest(msg.event.channel, lRes.message as string)
             return
     }
 }
