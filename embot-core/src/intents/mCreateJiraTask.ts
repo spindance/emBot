@@ -71,10 +71,10 @@ async function handleJiraUserResponse(rs: Fetch.Response): Promise<JiraUser> {
 }
 
 async function jiraIssueRequest(input: ExpectedInput, user: JiraUser): Promise<JiraIssue> {
-    // const rq = buildJiraIssueRequest(input, user)
-    // const rs = await fetch(rq)
+    const rq = buildJiraIssueRequest(input, user)
+    const rs = await fetch(rq)
 
-    return handleJiraIssueRequest(/* rs */)
+    return handleJiraIssueRequest(rs)
 }
 
 function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Request {
@@ -118,12 +118,9 @@ function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Requ
     })
 }
 
-async function handleJiraIssueRequest(/* rs: Fetch.Response */): Promise<JiraIssue> {
-    // const issue = await rs.json() as JiraIssue
-    // return issue
-    return Promise.resolve({
-        key: 'Dummy-123'
-    })
+async function handleJiraIssueRequest(rs: Fetch.Response): Promise<JiraIssue> {
+    const issue = await rs.json() as JiraIssue
+    return issue
 }
 
 function defaultJiraHeaders(): { [index: string]: string } {
