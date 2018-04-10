@@ -154,18 +154,27 @@ function handleCoreResponse(rs) {
                         case 'link_message':
                             link = r.link;
                             return [2, JSON.stringify({
-                                    header: {
-                                        title: link.title
-                                    },
                                     cards: [{
+                                            header: {
+                                                title: link.title
+                                            },
                                             sections: [{
                                                     widgets: [{
                                                             keyValue: {
-                                                                content: link.link_text,
-                                                                bottomLabel: link.summary,
+                                                                content: link.summary,
                                                                 onClick: {
                                                                     openLink: {
                                                                         url: link.link_target
+                                                                    }
+                                                                },
+                                                                button: {
+                                                                    textButton: {
+                                                                        text: link.link_text,
+                                                                        onClick: {
+                                                                            openLink: {
+                                                                                url: link.link_target
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
                                                             }
