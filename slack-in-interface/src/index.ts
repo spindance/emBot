@@ -28,14 +28,14 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     switch (body.type) {
         case 'url_verification':
             send(res, 200, { challenge: (body as Slack.URLVerification).challenge })
-            return
+            break
         case 'interactive_message':
             // someone clicked a button
             send(res, 200)
             // more coming soon:
             // create a Lex.Output and send it to embot-core
             // send core response to slack-out-interface
-            return
+            break
         case 'event_callback':
             // someone is talking to us
             send(res, 200)
@@ -48,12 +48,9 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
                 let rs = await coreRequest(lRes, email, '')
 
                 await slackOutRequest(msg.event.channel, rs)
-                return
+            } else {
+                await slackOutRequest(msg.event.channel, lRes.message as string)
             }
-
-            // else
-            await slackOutRequest(msg.event.channel, lRes.message as string)
-            return
     }
 }
 

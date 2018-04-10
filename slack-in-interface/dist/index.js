@@ -68,10 +68,10 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 return [3, 11];
             case 2:
                 micro_1.send(res, 200, { challenge: body.challenge });
-                return [2];
+                return [3, 11];
             case 3:
                 micro_1.send(res, 200);
-                return [2];
+                return [3, 11];
             case 4:
                 micro_1.send(res, 200);
                 msg = body;
@@ -88,11 +88,11 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 return [4, slackOutRequest(msg.event.channel, rs)];
             case 8:
                 _b.sent();
-                return [2];
+                return [3, 11];
             case 9: return [4, slackOutRequest(msg.event.channel, lRes.message)];
             case 10:
                 _b.sent();
-                return [2];
+                _b.label = 11;
             case 11: return [2];
         }
     });
