@@ -156,7 +156,7 @@ function slackOutRequest(channel, text) {
 }
 function buildSlackOutRequest(channel, text) {
     var url = SLACK_OUT_URL;
-    var body = { channel: channel, text: text };
+    var body = { type: 'plain_text', channel: channel, text: text };
     return new Fetch.Request(url, {
         method: 'POST',
         body: JSON.stringify(body),
