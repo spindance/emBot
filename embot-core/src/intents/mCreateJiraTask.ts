@@ -89,7 +89,7 @@ function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Requ
                 name: user.name
             },
             assignee: {
-                name: 'brucej'
+                name: 'erikk'
             },
             issuetype: {
                 name: 'Task'
