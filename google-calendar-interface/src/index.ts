@@ -28,7 +28,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
                     return true
                 }
 
-                return body.room.toLowerCase() === cal.summary.toLowerCase()
+                return cal.summary.toLowerCase().includes(body.room.toLowerCase())
             })
             .map(cal => {
                 return requestEvents(CLIENT, cal)

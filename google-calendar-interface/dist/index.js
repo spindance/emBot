@@ -63,7 +63,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                         if (body.room === undefined) {
                             return true;
                         }
-                        return body.room.toLowerCase() === cal.summary.toLowerCase();
+                        return cal.summary.toLowerCase().includes(body.room.toLowerCase());
                     })
                         .map(function (cal) {
                         return requestEvents(CLIENT, cal);
