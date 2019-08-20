@@ -64,7 +64,7 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                         title: input.lexOutput.slots.project + " Request from " + user.name,
                         link_text: issue.key,
                         link_target: JIRA_BASE_URL + "/browse/" + issue.key,
-                        summary: input.lexOutput.slots.summary
+                        summary: summary
                     }
                 });
                 return [2];
@@ -134,9 +134,6 @@ function buildJiraIssueRequest(input, user) {
             reporter: {
                 name: user.name
             },
-            assignee: {
-                name: 'brucej'
-            },
             issuetype: {
                 name: 'Task'
             },
@@ -146,13 +143,6 @@ function buildJiraIssueRequest(input, user) {
             timetracking: {
                 originalEstimate: '1h',
                 remainingEstimate: '1h'
-            },
-            duedate: calculateDueDate(),
-            customfield_11600: {
-                id: '11300'
-            },
-            customfield_11500: {
-                value: 'SpinDance'
             }
         }
     };
@@ -180,10 +170,4 @@ function defaultJiraHeaders() {
         'Content-Type': 'application/json',
         'Authorization': "Basic " + Base64.encode(JIRA_USERNAME + ":" + JIRA_PASSWORD)
     };
-}
-function calculateDueDate() {
-    var d = new Date();
-    var dayOfMonth = d.getDate();
-    d.setDate(dayOfMonth + 7);
-    return d.toISOString();
 }

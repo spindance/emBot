@@ -41,7 +41,7 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
             title: `${input.lexOutput.slots.project} Request from ${user.name}`,
             link_text: issue.key,
             link_target: `${JIRA_BASE_URL}/browse/${issue.key}`,
-            summary: input.lexOutput.slots.summary
+            summary: summary
         }
     })
 }
@@ -88,9 +88,6 @@ function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Requ
             reporter: {
                 name: user.name
             },
-            assignee: {
-                name: 'brucej'
-            },
             issuetype: {
                 name: 'Task'
             },
@@ -101,13 +98,6 @@ function buildJiraIssueRequest(input: ExpectedInput, user: JiraUser): Fetch.Requ
                 originalEstimate: '1h',
                 remainingEstimate: '1h'
             },
-            duedate: calculateDueDate(),
-            customfield_11600: { // SpinDance Project
-                id: '11300' // SD-InternalRequest
-            },
-            customfield_11500: { // Customer
-                value: 'SpinDance'
-            }
         }
     }
 
@@ -128,12 +118,4 @@ function defaultJiraHeaders(): { [index: string]: string } {
         'Content-Type': 'application/json',
         'Authorization': `Basic ${Base64.encode(JIRA_USERNAME + ":" + JIRA_PASSWORD)}`
     }
-}
-
-function calculateDueDate(): string {
-    var d = new Date()
-    var dayOfMonth = d.getDate()
-    d.setDate(dayOfMonth + 7)
-
-    return d.toISOString()
 }
