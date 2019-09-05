@@ -20,6 +20,10 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
         case 'Calendar':
             text = 'If you ask eg. ```is anyone in Missile Command?``` I can tell you if the room is available.'
             break
+        case 'Awesomeness Nominator':
+        case 'Nominator':
+        case 'Awesomeness nominator':
+            text = 'I can prefill a nomination with a name and give you a link if you say ```Awesomeness nominator``` or ```Nominate``` followed by a name.'
         default:
             text = 'You triggered the GenericHelp Intent!'
             break
