@@ -37,30 +37,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 exports.__esModule = true;
 var micro_1 = require("micro");
+var FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScGAR0i1t-7x5Fu3gvYM3q7oRRv10uUTasYDFMcCdN6pZgjsw/viewform?usp=pp_url&entry.138056703=";
 module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, text;
+    var input, person, text;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4, micro_1.json(req)];
             case 1:
-                body = _a.sent();
-                switch (body.lexOutput.slots.topic) {
-                    case 'Jira':
-                    case 'IT':
-                        text = 'I can create Jira tasks for IT support if you say ```create IT ticket``` and then describe the task.';
-                        break;
-                    case 'Calendar':
-                        text = 'If you ask eg. ```is anyone in Missile Command?``` I can tell you if the room is available.';
-                        break;
-                    case 'Awesomeness Nominator':
-                    case 'Nominator':
-                    case 'Awesomeness nominator':
-                        text = 'I can prefill a nomination with a name and give you a link if you say ```Awesomeness nominator``` or ```Nominate``` followed by a name.';
-                    default:
-                        text = 'You triggered the GenericHelp Intent!';
-                        break;
-                }
-                micro_1.send(res, 200, { type: 'plain_text', text: text });
+                input = _a.sent();
+                person = input.lexOutput.slots.person
+                    .replace(' ', '+');
+                text = 'Awesomeness Nominator to the rescue!';
+                micro_1.send(res, 200, {
+                    type: 'link_message',
+                    link: {
+                        title: "Nominate " + input.lexOutput.slots.person + " for Awesomeness",
+                        link_text: "here",
+                        link_target: "" + FORM_URL + person,
+                        summary: text
+                    }
+                });
                 return [2];
         }
     });
