@@ -22,8 +22,8 @@ module.exports = async (req: HTTP.IncomingMessage, res: HTTP.ServerResponse) => 
     send(res, 200, {
         type: 'link_message',
         link: {
-            title: `Nominate ${input.lexOutput.slots.person} for Awesomeness`,
-            link_text: `here`,
+            title: `Nominating ${input.lexOutput.slots.person} for Awesomeness`,
+            link_text: `Continue the Nomination`,
             link_target: `${FORM_URL}${person}`,
             summary: text
         }

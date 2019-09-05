@@ -51,8 +51,8 @@ module.exports = function (req, res) { return __awaiter(_this, void 0, void 0, f
                 micro_1.send(res, 200, {
                     type: 'link_message',
                     link: {
-                        title: "Nominate " + input.lexOutput.slots.person + " for Awesomeness",
-                        link_text: "here",
+                        title: "Nominating " + input.lexOutput.slots.person + " for Awesomeness",
+                        link_text: "Continue the Nomination",
                         link_target: "" + FORM_URL + person,
                         summary: text
                     }
